@@ -44370,6 +44370,12 @@ const ArrSearchSuggest=[...ProductListBlush,...ProductListBronzer,...ProductList
 ,...ProductListEyeLiner,...ProductListEyeShadow,...ProductListFoudation
 ,...ProductListLipLStick,...ProductListLipLiner,...ProductListMascart
 ,...ProductListNailPolist];
+
+const ArrayImage=ArrSearchSuggest.map(function(item,idx){
+  return item.api_featured_image;
+})
+
+console.log(ArrayImage)
 console.log(ArrSearchSuggest)
 CurrentArrItems=CategoryMain[currentPage];
 PreventEmptyLinks();
@@ -44382,6 +44388,22 @@ ControlPage();
 FliterArrProduct();
 HomeFliterTag();
 ModalControl();
+LogOut();
+const KeyRegis='KeyRegis'
+
+function LogOut(){
+  $('.header__navbar-user-item.logout-btn').onclick=function(){
+      Store.removeItem(KeyRegis);
+  }
+}
+
+CheckCartShopping.onclick=function(e){
+  if(JSON.parse(Store.getItem(CartProductKey)).length==0){
+      e.preventDefault();
+  }
+     
+}
+
 function HomeFliterTag(){
   FliterBtn.forEach(function(item,idx){
     item.onclick=function(){
@@ -44457,7 +44479,7 @@ function RenderModalDetail(item){
      
   $('.modal-detail-product-body').innerHTML='<i class="fas fa-times js-close-btn"></i>';
   let html=`
-  <div class="modal-detail-product-img" style="background-image: url(${item.api_featured_image});"></div>
+  <div class="modal-detail-product-img" style="background-image: url(https:${item.api_featured_image});"></div>
   <div class="modal-detail-product-contend">
       <h3 class="modal-detail-product-nameProduct">${item.name} </h3>
       <p class="modal-detail-product-description">
@@ -44605,7 +44627,7 @@ function RenderProducts(items){
         let html=`
         <div id="${item.id}" class="col l-2-4 m-4 c-6">
             <a class="home-product-item" >
-                <div class="home-product-item__img" style="background-image: url(${item.api_featured_image});"></div>
+                <div class="home-product-item__img" style="background-image: url('https:${item.api_featured_image}');"></div>
                 <h4 class="home-product-item__name">${item.name}</h4>
                 <div class="home-product-item__price">
                     <span class="home-product-item__price-old">${Math.floor( (item.price)  ) }$</span>
@@ -44659,11 +44681,7 @@ function PreventEmptyLinks(){
         }
     })
 
-    CheckCartShopping.onclick=function(e){
-      console.log( Store.getItem(CartProductKey));
-      if(Store.getItem(CartProductKey)==[])
-          e.preventDefault();
-    }
+    
 }
 
 function SearchFeature(){
@@ -44924,7 +44942,9 @@ function RenderCartShopping(){
             let string=item.ImageURl;
             if(string.startsWith('url('))
               url=string.substring( string.indexOf('"')+1,string.lastIndexOf('"'))
-             else url=string;
+             else if(string.startsWith('//s3')){
+               url=`https:${string}`
+             }else url=string;
             console.log(string);
             return `
             <li class="header__cart-item">
